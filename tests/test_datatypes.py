@@ -2,6 +2,8 @@
 import unittest
 
 from multiweather.data import (
+    make_distance,
+    make_temperature,
     Temperature,
     Distance,
     Speed
@@ -23,6 +25,12 @@ class TestDataTypes(unittest.TestCase):
         with self.assertRaises(ValueError):
             Temperature(c=10, f=10)
 
+        # Test comparison and convenience funcs
+        self.assertEqual(temp1, make_temperature(c=20))
+        self.assertEqual(temp1, make_temperature(f=68))
+        self.assertEqual(temp2, make_temperature(f=80))
+        self.assertIsNone(make_temperature())
+
     def test_distance(self):
         dist1 = Distance(km=100)
         self.assertEqual(dist1.km, 100)
@@ -34,6 +42,11 @@ class TestDataTypes(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             Distance(km=1, mi=1)
+
+        # Test comparison and convenience funcs
+        self.assertEqual(dist1, make_distance(km=100))
+        self.assertEqual(dist2, make_distance(mi=200))
+        self.assertIsNone(make_distance())
 
     def test_speed(self):
         speed1 = Speed(kph=100)
@@ -59,6 +72,8 @@ class TestDataTypes(unittest.TestCase):
             Speed(mph=1, ms=2)
         with self.assertRaises(ValueError):
             Speed(kph=1, mph=2, ms=3)
+
+        self.assertEqual(speed1, Speed(kph=100))
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,8 +3,9 @@
 from dataclasses import dataclass, field
 import datetime
 
-# pylint: disable=too-few-public-methods
+from multiweather.log import logger
 
+# pylint: disable=too-few-public-methods
 class Temperature:
     """Represents a temperature value"""
     __slots__ = ("c", "f")
@@ -21,6 +22,17 @@ class Temperature:
     def __repr__(self):
         return f'<Temperature {self.c}C / {self.f}F>'
 
+    def __eq__(self, other):
+        return self.c == other.c and self.f == other.f
+
+def make_temperature(f=None, c=None) -> Temperature | None:
+    """Convenience method to create a Temperature, or None if the data is missing"""
+    if f is not None:
+        return Temperature(f=f)
+    if c is not None:
+        return Temperature(c=c)
+    return None
+
 class Distance:
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
@@ -36,6 +48,17 @@ class Distance:
 
     def __repr__(self):
         return f'<Distance {self.km}km / {self.mi}mi>'
+
+    def __eq__(self, other):
+        return self.km == other.km and self.mi == other.mi
+
+def make_distance(mi=None, km=None) -> Distance | None:
+    """Convenience method to create a Distance, or None if the data is missing"""
+    if mi is not None:
+        return Distance(mi=mi)
+    if km is not None:
+        return Distance(km=km)
+    return None
 
 class Speed:
     """Represents a speed value (wind speed, etc.)"""
@@ -66,10 +89,17 @@ class Speed:
     def __repr__(self):
         return f'<Speed {self.kph}kph / {self.mph}mph / {self.ms}m/s>'
 
+    def __eq__(self, other):
+        return self.kph == other.kph and self.mph == other.mph and self.ms == other.ms
+
 class Precipitation:
-    """Represents a precipitation amount value"""
-    __slots__ = ("mm", "inches")
-    def __init__(self, mm=None, inches=None):
+    """Represents a precipitation value (amount and percentage)"""
+    __slots__ = ("percentage", "mm", "inches")
+    def __init__(self, percentage, mm=None, inches=None):
+        if not 0 <= percentage <= 1:
+            raise ValueError(f"Invalid percentage value {percentage}")
+        self.percentage = percentage
+
         if len(list(filter(None, (mm, inches)))) != 1:
             raise ValueError("Exactly one of 'mm', 'inches' must be specified")
         if mm is not None:
@@ -82,6 +112,21 @@ class Precipitation:
     def __repr__(self):
         return f'<Precipitation {self.mm}mm / {self.inches}in>'
 
+    def __eq__(self, other):
+        return self.percentage == other.percentage and self.mm == other.mm and self.inches == other.inches
+
+def make_precipitation(percentage, mm=None, inches=None) -> Precipitation | None:
+    """Convenience method to create a Precipitation, or None if the data is missing"""
+    if percentage is None:
+        logger.debug("missing precipitation percentage")
+        return None
+    if mm:
+        return Precipitation(percentage, mm=mm)
+    if inches:
+        return Precipitation(percentage, inches=inches)
+    logger.debug("missing precipitation amount")
+    return None
+
 @dataclass
 class WindConditions:
     """Represents wind conditions (speed, gust, and direction)"""
@@ -92,17 +137,40 @@ class WindConditions:
     # Direction in meteorological angles
     direction: float
 
+def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph=None) -> WindConditions | None:
+    """Convenience method to create a WindConditions, or None if the data is missing"""
+    if direction is None:
+        logger.debug("missing wind angle")
+        return None
+    direction = float(direction)
+    if speed_mph and gust_mph:
+        return WindConditions(
+            speed=Speed(mph=speed_mph),
+            gust=Speed(mph=gust_mph),
+            direction=direction,
+        )
+    if speed_kph and gust_kph:
+        return WindConditions(
+            speed=Speed(kph=speed_kph),
+            gust=Speed(kph=gust_kph),
+            direction=direction,
+        )
+    logger.debug("missing wind amount")
+    return None
+
 # pylint: disable=too-many-instance-attributes
 @dataclass
 class WeatherConditions:
-    """Represents the overall weather conditions at a specific time"""
-    # Summary text of current conditions (e.g. "Sunny")
-    condition_summary: str
-    # Icon URL representing the condition, if available
-    condition_icon: str | None
+    """Represents the weather conditions for some time period"""
+    # Summary text of weather conditions (e.g. "Sunny")
+    summary: str | None
+    # Icon URL representing weather conditions, if available
+    icon: str | None
+    # Time associated with this weather report (timezone-aware date)
+    time: datetime.datetime
 
     # Temperature
-    temperature: Temperature
+    temperature: Temperature | None
     # Feels like / apparent temperature
     feels_like: Temperature | None
     # Dew point:
@@ -112,10 +180,8 @@ class WeatherConditions:
     # Atmospheric pressure (hPa)
     pressure: float | None
 
-    # Precipitation amount
+    # Precipitation
     precipitation: Precipitation | None
-    # Percentage of precipitation
-    precipitation_prob: float | None
     # Cloud coverage percentage
     cloud_cover: float | None
 
@@ -127,23 +193,27 @@ class WeatherConditions:
     # Visibility
     visibility: Distance | None
 
-    # Current, sunrise, sunset times (seconds since Unix epoch)
-    time: float | None
-    sunrise: float | None
-    sunset: float | None
+    # Sunrise, sunset times
+    sunrise: datetime.datetime | None
+    sunset: datetime.datetime | None
+
+    # Low & high temperatures (for forecasts)
+    low_temperature: Temperature | None
+    high_temperature: Temperature | None
+    low_feels_like: Temperature | None
+    high_feels_like: Temperature | None
 
 @dataclass
 class WeatherResponse:
     """Represents the overall weather response"""
-    # Current condition
+    # Current conditions
     current: WeatherConditions
-    # Daily forecast. Key is a timezone *aware* datetime, in the timezone of the requested weather location
-    daily_forecast: dict[datetime.datetime, WeatherConditions] = field(default_factory=dict)
 
-    def __post_init__(self):
-        for key in self.daily_forecast:
-            if key.tzinfo is None:
-                raise ValueError("Keys to WeatherResponse.daily_forecast should be timezone aware")
+    # Pretty URL of the weather request
+    url: str | None
+
+    # Daily forecasts
+    daily_forecast: list[WeatherConditions] = field(default_factory=list)
 
 __all__ = [
     'Temperature',
