@@ -10,7 +10,7 @@ class Temperature:
     """Represents a temperature value"""
     __slots__ = ("c", "f")
     def __init__(self, c=None, f=None):
-        if len(list(filter(None, (c, f)))) != 1:
+        if len(list(filter(lambda x: x is not None, (c, f)))) != 1:
             raise ValueError("Exactly one of 'c' and 'f' must be specified")
         if c is not None:
             self.c = float(c)
@@ -37,7 +37,7 @@ class Distance:
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
     def __init__(self, km=None, mi=None):
-        if len(list(filter(None, (km, mi)))) != 1:
+        if len(list(filter(lambda x: x is not None, (km, mi)))) != 1:
             raise ValueError("Exactly one of 'km', 'mi' must be specified")
         if km is not None:
             self.km = float(km)
@@ -71,7 +71,7 @@ class Speed:
         "ms"
     )
     def __init__(self, kph=None, mph=None, ms=None):
-        if len(list(filter(None, (kph, mph, ms)))) != 1:
+        if len(list(filter(lambda x: x is not None, (kph, mph, ms)))) != 1:
             raise ValueError("Exactly one of 'kph', 'mph' and 'ms' must be specified")
         if kph is not None:
             self.kph = float(kph)
@@ -100,7 +100,7 @@ class Precipitation:
             raise ValueError(f"Invalid percentage value {percentage}")
         self.percentage = percentage
 
-        if len(list(filter(None, (mm, inches)))) != 1:
+        if len(list(filter(lambda x: x is not None, (mm, inches)))) != 1:
             raise ValueError("Exactly one of 'mm', 'inches' must be specified")
         if mm is not None:
             self.mm = float(mm)
@@ -117,9 +117,9 @@ class Precipitation:
 
 def make_precipitation(percentage=None, mm=None, inches=None) -> Precipitation | None:
     """Convenience method to create a Precipitation, or None if the data is missing"""
-    if mm:
+    if mm is not None:
         return Precipitation(percentage=percentage, mm=mm)
-    if inches:
+    if inches is not None:
         return Precipitation(percentage=percentage, inches=inches)
     logger.debug("missing precipitation amount")
     return None
@@ -130,26 +130,33 @@ class WindConditions:
     # Wind speed
     speed: Speed
     # Wind gust
-    gust: Speed
+    gust: Speed | None
     # Direction in meteorological angles
     direction: float
 
-def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph=None) -> WindConditions | None:
+def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph=None,
+              speed_ms=None, gust_ms=None) -> WindConditions | None:
     """Convenience method to create a WindConditions, or None if the data is missing"""
     if direction is None:
         logger.debug("missing wind angle")
         return None
     direction = float(direction)
-    if speed_mph and gust_mph:
+    if speed_mph is not None:
         return WindConditions(
             speed=Speed(mph=speed_mph),
-            gust=Speed(mph=gust_mph),
+            gust=Speed(mph=gust_mph) if gust_mph is not None else None,
             direction=direction,
         )
-    if speed_kph and gust_kph:
+    if speed_kph is not None:
         return WindConditions(
             speed=Speed(kph=speed_kph),
-            gust=Speed(kph=gust_kph),
+            gust=Speed(kph=gust_kph) if gust_kph is not None else None,
+            direction=direction,
+        )
+    if speed_ms is not None:
+        return WindConditions(
+            speed=Speed(ms=speed_ms),
+            gust=Speed(ms=gust_ms) if gust_ms is not None else None,
             direction=direction,
         )
     logger.debug("missing wind amount")

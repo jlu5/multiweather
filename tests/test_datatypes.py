@@ -23,6 +23,10 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(temp2.f, 80)
         self.assertEqual(temp2.c, 26.666666666666667)
 
+        # zero values should be accepted
+        Temperature(c=0)
+        Temperature(f=0)
+
         with self.assertRaises(ValueError):
             Temperature(c=10, f=10)
 
@@ -40,6 +44,9 @@ class TestDataTypes(unittest.TestCase):
         dist2 = Distance(mi=200)
         self.assertEqual(dist2.km, 200*1.609)
         self.assertEqual(dist2.mi, 200)
+
+        Distance(km=0)
+        Distance(mi=0)
 
         with self.assertRaises(ValueError):
             Distance(km=1, mi=1)
@@ -64,6 +71,10 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(speed3.ms, 360)
         self.assertEqual(speed3.kph, 1296)
         self.assertEqual(speed3.mph, 1296/1.609)
+
+        Speed(kph=0)
+        Speed(mph=0)
+        Speed(ms=0)
 
         with self.assertRaises(ValueError):
             Speed(kph=1, mph=2)
