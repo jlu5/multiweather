@@ -4,7 +4,10 @@ import datetime
 import os
 import unittest
 
-from multiweather import PirateWeatherBackend
+from multiweather import (
+    OpenMeteoBackend,
+    PirateWeatherBackend,
+)
 
 API_KEY_PIRATEWEATHER = os.environ.get('API_KEY_PIRATEWEATHER')
 
@@ -57,6 +60,11 @@ class BaseTestCase:
 class TestPirateWeather(BaseTestCase.IntegrationTestBase):
     def setUp(self):
         self.backend = PirateWeatherBackend(API_KEY_PIRATEWEATHER)
+
+class TestOpenMeteo(BaseTestCase.IntegrationTestBase):
+    def setUp(self):
+        # Disable fill_current_with_hourly to save a few API calls
+        self.backend = OpenMeteoBackend(fill_current_with_hourly=False)
 
 if __name__ == '__main__':
     unittest.main()
