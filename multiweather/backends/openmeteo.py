@@ -139,7 +139,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             forecasts.append(forecast_out)
 
         resp = WeatherResponse(
-            name='Open-Meteo',
+            name='Open-Meteo.com',
             url='https://open-meteo.com/',
             current=current_out,
             daily_forecast=forecasts,
