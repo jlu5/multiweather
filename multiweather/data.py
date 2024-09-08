@@ -205,11 +205,12 @@ class WeatherConditions:
 
 @dataclass
 class WeatherResponse:
-    """Represents the overall weather response"""
+    """Represents a combined weather response (current conditions and daily forecasts)"""
     # Current conditions
     current: WeatherConditions
 
-    # Pretty URL of the weather request
+    # Weather backend name & URL of the weather report (for attribution purposes)
+    name: str
     url: str | None
 
     # Daily forecasts

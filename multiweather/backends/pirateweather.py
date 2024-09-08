@@ -16,10 +16,6 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
         self.api_key = api_key
         self.base_url = base_url
 
-    @classmethod
-    def name(cls):
-        return 'Pirate Weather'
-
     def _get_json_request_url(self, location):
         lat, lon = location
         # Note: default units are US imperial, but this library converts units by itself anyways
@@ -81,8 +77,9 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             forecasts.append(self._format_weather_inner(forecast_data, tz))
 
         resp = WeatherResponse(
+            name='Pirate Weather',
+            url=url,
             current=current,
             daily_forecast=forecasts,
-            url=url
         )
         return resp

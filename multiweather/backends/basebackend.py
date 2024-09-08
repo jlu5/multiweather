@@ -19,13 +19,6 @@ class APIError(Exception):
 
 class BaseWeatherBackend(ABC):
     """Base class for weather backends"""
-    @classmethod
-    @abstractmethod
-    def name(cls):
-        """Return the name of this weather API.
-
-        Most weather services require attribution, so this should be part of the final output!"""
-
     async def get_weather(self, location) -> WeatherResponse:
         """Fetch weather for <location> from the API (asynchronous)"""
 
