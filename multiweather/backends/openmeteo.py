@@ -2,7 +2,7 @@ import datetime
 import urllib.parse
 import zoneinfo
 
-from multiweather.backends.basebackend import APIError, BaseJSONWeatherBackend
+from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.consts import get_summary_for_wmo_code
 from multiweather.data import (
     make_precipitation,
@@ -11,6 +11,7 @@ from multiweather.data import (
     WeatherConditions,
     WeatherResponse,
 )
+from multiweather.exceptions import APIError
 
 class OpenMeteoBackend(BaseJSONWeatherBackend):
     def __init__(self, api_key=None, base_url=None, fill_current_with_hourly=True):

@@ -1,7 +1,7 @@
 import datetime
 import zoneinfo
 
-from multiweather.backends.basebackend import APIError, BaseJSONWeatherBackend
+from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
     make_precipitation,
     make_temperature,
@@ -9,6 +9,7 @@ from multiweather.data import (
     WeatherConditions,
     WeatherResponse,
 )
+from multiweather.exceptions import APIError
 
 class PirateWeatherBackend(BaseJSONWeatherBackend):
     def __init__(self, api_key, base_url='https://api.pirateweather.net/forecast'):

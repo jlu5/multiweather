@@ -15,9 +15,6 @@ from multiweather.version import __version__
 type LatLon = tuple[float, float]
 # type Location = LatLon | str
 
-class APIError(Exception):
-    """Generic class for API errors"""
-
 DEFAULT_HEADERS = {
     'User-Agent': f'Mozilla/5.0 (compatible; python-multiweather/{__version__})'
 }
