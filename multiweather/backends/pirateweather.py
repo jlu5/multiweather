@@ -34,6 +34,7 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             summary=data.get('summary'),
             # TODO: icons are provided as names, need to find a URL for them
             icon=None,
+            weather_code=data['icon'],
             time=datetime.datetime.fromtimestamp(data['time'], tz),
 
             temperature=make_temperature(f=data.get('temperature')),

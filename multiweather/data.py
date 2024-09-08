@@ -159,8 +159,10 @@ def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph
 @dataclass
 class WeatherConditions:
     """Represents the weather conditions for some time period"""
-    # Summary text of weather conditions (e.g. "Sunny")
+    # Human readable summary of weather conditions (e.g. "Sunny")
     summary: str | None
+    # Weather code (API specific)
+    weather_code: str | int | None
     # Icon URL representing weather conditions, if available
     icon: str | None
     # Time associated with this weather report (timezone-aware date)
