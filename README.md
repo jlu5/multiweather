@@ -5,17 +5,18 @@ A Python weather library supporting multiple backends. Because weather APIs [go]
 ## Currently supported
 
 - [Open-Meteo.com](https://open-meteo.com/)
+- [OpenWeatherMap](https://openweathermap.org) (Professional collections -> Current weather)
 - [PirateWeather](https://pirateweather.net/en/latest/)
 
 ### Comparison of sources
 
-| Data Source                                       | Open-Meteo  | PirateWeather |
-| ------------------------------------------------- | ----------- | ------------- |
-| **Current conditions**                            | ✅          | ✅            |
-| **Daily (days)**                                  | ✅ (max 16) | ✅ (7)        |
-| **Input location as string** (built-in geocoding) | ✅*          | ❌            |
+| Data Source                                       | Open-Meteo          | OpenWeatherMap    | PirateWeather |
+| ------------------------------------------------- | ------------------- | ----------------- | ------------- |
+| **API Key optional**                              | ✅                  | ❌                | ❌            |
+| **Current conditions**                            | ✅                  | ✅                | ✅            |
+| **Daily (days)**                                  | ✅ (max 16)         | ❌ (paid)         | ✅ (7)        |
+| **Input location as string** (built-in geocoding) | ✅ (city name only) | ✅ (city,country) | ❌            |
 
-\* Limited flexibility (only first result is used)
 
 ## Usage
 ```python
