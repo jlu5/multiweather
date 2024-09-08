@@ -14,11 +14,11 @@ from multiweather import OpenMeteoBackend # or your preferred backend
 om = OpenMeteoBackend() # pass api_key=... for those backends require one
 
 # Blocking fetcher
-om.get_weather_sync((lat, lon))
+weather = om.get_weather_sync((lat, lon))
 
 # Or in an async context
 async def get_weather():
-    await om.get_weather((lat, lon))
+    weather = await om.get_weather((lat, lon))
 ```
 
 Both `get_weather` and `get_weather_sync` return a [`WeatherResponse`](multiweather/data.py) dataclass instance.
