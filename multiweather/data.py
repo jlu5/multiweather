@@ -95,8 +95,8 @@ class Speed:
 class Precipitation:
     """Represents a precipitation value (amount and percentage)"""
     __slots__ = ("percentage", "mm", "inches")
-    def __init__(self, percentage, mm=None, inches=None):
-        if not 0 <= percentage <= 1:
+    def __init__(self, percentage=None, mm=None, inches=None):
+        if percentage is not None and not 0 <= percentage <= 1:
             raise ValueError(f"Invalid percentage value {percentage}")
         self.percentage = percentage
 
@@ -110,20 +110,17 @@ class Precipitation:
             self.mm = self.inches * 25.4
 
     def __repr__(self):
-        return f'<Precipitation {self.mm}mm / {self.inches}in>'
+        return f'<Precipitation {self.mm}mm / {self.inches}in {self.percentage}%>'
 
     def __eq__(self, other):
         return self.percentage == other.percentage and self.mm == other.mm and self.inches == other.inches
 
-def make_precipitation(percentage, mm=None, inches=None) -> Precipitation | None:
+def make_precipitation(percentage=None, mm=None, inches=None) -> Precipitation | None:
     """Convenience method to create a Precipitation, or None if the data is missing"""
-    if percentage is None:
-        logger.debug("missing precipitation percentage")
-        return None
     if mm:
-        return Precipitation(percentage, mm=mm)
+        return Precipitation(percentage=percentage, mm=mm)
     if inches:
-        return Precipitation(percentage, inches=inches)
+        return Precipitation(percentage=percentage, inches=inches)
     logger.debug("missing precipitation amount")
     return None
 
