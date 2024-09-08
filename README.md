@@ -7,6 +7,16 @@ A Python weather library supporting multiple backends. Because weather APIs [go]
 - [Open-Meteo.com](https://open-meteo.com/)
 - [PirateWeather](https://pirateweather.net/en/latest/)
 
+### Comparison of sources
+
+| Data Source                                       | Open-Meteo  | PirateWeather |
+| ------------------------------------------------- | ----------- | ------------- |
+| **Current conditions**                            | ✅          | ✅            |
+| **Daily (days)**                                  | ✅ (max 16) | ✅ (7)        |
+| **Input location as string** (built-in geocoding) | ✅*          | ❌            |
+
+\* Limited flexibility (only first result is used)
+
 ## Usage
 ```python
 from multiweather import OpenMeteoBackend # or your preferred backend

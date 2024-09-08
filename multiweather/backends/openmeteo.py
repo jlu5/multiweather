@@ -11,7 +11,7 @@ from multiweather.data import (
     WeatherConditions,
     WeatherResponse,
 )
-from multiweather.exceptions import APIError
+from multiweather.exceptions import APIError, GeocodeAPIError
 
 class OpenMeteoBackend(BaseJSONWeatherBackend):
     def __init__(self, api_key=None, base_url=None, fill_current_with_hourly=True):
@@ -146,3 +146,20 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             daily_forecast=forecasts,
         )
         return resp
+
+    def _get_json_geocode_url(self, location):
+        args = {
+            'name': location,
+            'count': 1,
+            'format': 'json',
+            'language': 'en' # TODO lang support
+        }
+        return f'https://geocoding-api.open-meteo.com/v1/search?{urllib.parse.urlencode(args)}'
+
+    def _parse_geocode(self, location, data):
+        if data.get('error'):
+            raise GeocodeAPIError(data.get('reason'))
+        results = data.get('results')
+        if not results:
+            raise GeocodeAPIError(f'No results for {location!r}')
+        return (results[0]['latitude'], results[0]['longitude'])

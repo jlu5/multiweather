@@ -17,6 +17,7 @@ class BaseTestCase:
     class IntegrationTestBase(unittest.IsolatedAsyncioTestCase):
         MAX_TIME_DRIFT = datetime.timedelta(hours=12)
         backend = None
+        supports_geocoding = False
 
         def _smoke_test_weather(self, weatherdata):
             """Run basic checks on the weather data (independent of the actual reported values)"""
@@ -56,6 +57,20 @@ class BaseTestCase:
             w = await self.backend.get_weather((48.000000, 2.000000))
             self._smoke_test_weather(w)
 
+        async def test_geocoding_async(self):
+            """Test the synchronous get_weather path with geocoding, if supported by the backend"""
+            if not self.supports_geocoding:
+                return
+            w = await self.backend.get_weather('London')
+            self._smoke_test_weather(w)
+
+        def test_geocoding_sync(self):
+            """Test the synchronous get_weather path with geocoding, if supported by the backend"""
+            if not self.supports_geocoding:
+                return
+            w = self.backend.get_weather_sync('Vancouver')
+            self._smoke_test_weather(w)
+
 @unittest.skipUnless(API_KEY_PIRATEWEATHER, "API_KEY_PIRATEWEATHER env var not set")
 class TestPirateWeather(BaseTestCase.IntegrationTestBase):
     def setUp(self):
@@ -65,6 +80,7 @@ class TestOpenMeteo(BaseTestCase.IntegrationTestBase):
     def setUp(self):
         # Disable fill_current_with_hourly to save a few API calls
         self.backend = OpenMeteoBackend(fill_current_with_hourly=False)
+        self.supports_geocoding = True
 
 if __name__ == '__main__':
     unittest.main()
