@@ -22,7 +22,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
         self.base_url = base_url or default_base_url
         self.fill_current_with_hourly = fill_current_with_hourly
 
-    def _get_json_request_url(self, location):
+    def _get_json_request_url(self, location, forecast_days=0):
         lat, lon = location
         args = {
             'latitude': lat,
@@ -34,11 +34,14 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             # These fields should more or less match the coverage of THIS library
             'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,cloud_cover,'
                 'pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,weather_code,is_day',
-
-            'daily': 'temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,'
-                'sunrise,sunset,uv_index_max,precipitation_sum,precipitation_probability_max,'
-                'wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,weather_code,'
         }
+        if forecast_days:
+            args.update({
+                'daily': 'temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,'
+                    'sunrise,sunset,uv_index_max,precipitation_sum,precipitation_probability_max,'
+                    'wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,weather_code,',
+                'forecast_days': forecast_days,
+            })
         if self.api_key:  # note: untested
             args['api_key'] = self.api_key
 
@@ -102,42 +105,43 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             high_feels_like=None,
         )
         forecasts = []
-        daily_data = data['daily']
-        for day_index, daily_forecast_ts in enumerate(daily_data['time']):
-            daily_forecast_time = datetime.datetime.fromtimestamp(daily_forecast_ts, tz)
-            weather_code = daily_data['weather_code'][day_index]
-            forecast_out = WeatherConditions(
-                weather_code=weather_code,
-                summary=get_summary_for_wmo_code(weather_code),
-                # TODO: need to translate from WMO codes to icon
-                icon=None,
-                time=daily_forecast_time,
-                low_temperature=daily_data['temperature_2m_min'][day_index],
-                high_temperature=daily_data['temperature_2m_max'][day_index],
-                low_feels_like=daily_data['apparent_temperature_min'][day_index],
-                high_feels_like=daily_data['apparent_temperature_max'][day_index],
-                precipitation=make_precipitation(
-                    mm=daily_data['precipitation_sum'][day_index],
-                    percentage=daily_data['precipitation_probability_max'][day_index]/100,
-                ),
-                wind=make_wind(
-                    direction=daily_data['wind_direction_10m_dominant'][day_index],
-                    speed_kph=daily_data['wind_speed_10m_max'][day_index],
-                    gust_kph=daily_data['wind_gusts_10m_max'][day_index],
-                ),
-                uv_index=daily_data['uv_index_max'][day_index],
-                sunrise=datetime.datetime.fromtimestamp(daily_data['sunrise'][day_index], tz),
-                sunset=datetime.datetime.fromtimestamp(daily_data['sunset'][day_index], tz),
-                # Only for current conditions
-                temperature=None,
-                feels_like=None,
-                humidity=None,
-                pressure=None,
-                cloud_cover=None,
-                dew_point=None,
-                visibility=None,
-            )
-            forecasts.append(forecast_out)
+        daily_data = data.get('daily')
+        if daily_data:
+            for day_index, daily_forecast_ts in enumerate(daily_data['time']):
+                daily_forecast_time = datetime.datetime.fromtimestamp(daily_forecast_ts, tz)
+                weather_code = daily_data['weather_code'][day_index]
+                forecast_out = WeatherConditions(
+                    weather_code=weather_code,
+                    summary=get_summary_for_wmo_code(weather_code),
+                    # TODO: need to translate from WMO codes to icon
+                    icon=None,
+                    time=daily_forecast_time,
+                    low_temperature=daily_data['temperature_2m_min'][day_index],
+                    high_temperature=daily_data['temperature_2m_max'][day_index],
+                    low_feels_like=daily_data['apparent_temperature_min'][day_index],
+                    high_feels_like=daily_data['apparent_temperature_max'][day_index],
+                    precipitation=make_precipitation(
+                        mm=daily_data['precipitation_sum'][day_index],
+                        percentage=daily_data['precipitation_probability_max'][day_index]/100,
+                    ),
+                    wind=make_wind(
+                        direction=daily_data['wind_direction_10m_dominant'][day_index],
+                        speed_kph=daily_data['wind_speed_10m_max'][day_index],
+                        gust_kph=daily_data['wind_gusts_10m_max'][day_index],
+                    ),
+                    uv_index=daily_data['uv_index_max'][day_index],
+                    sunrise=datetime.datetime.fromtimestamp(daily_data['sunrise'][day_index], tz),
+                    sunset=datetime.datetime.fromtimestamp(daily_data['sunset'][day_index], tz),
+                    # Only for current conditions
+                    temperature=None,
+                    feels_like=None,
+                    humidity=None,
+                    pressure=None,
+                    cloud_cover=None,
+                    dew_point=None,
+                    visibility=None,
+                )
+                forecasts.append(forecast_out)
 
         resp = WeatherResponse(
             name='Open-Meteo.com',

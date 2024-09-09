@@ -31,7 +31,7 @@ class BaseJSONWeatherBackend(BaseWeatherBackend):
     """Base class for weather backends using a JSON API"""
 
     @abstractmethod
-    def _get_json_request_url(self, location: Location) -> str:
+    def _get_json_request_url(self, location: Location, forecast_days=0) -> str:
         """Get the JSON API URL for a request"""
 
     @abstractmethod
@@ -49,7 +49,7 @@ class BaseJSONWeatherBackend(BaseWeatherBackend):
         """Given a geocode API's JSON response, parse a lat, lon pair"""
         raise NotImplementedError("Only (lat, lon) inputs are supported by this backend")
 
-    async def get_weather(self, location: Location, headers=None) -> WeatherResponse:
+    async def get_weather(self, location: Location, headers=None, forecast_days=0) -> WeatherResponse:
         async with aiohttp.ClientSession(headers=headers) as session:
             if isinstance(location, str):
                 geocode_url = self._get_json_geocode_url(location)
@@ -59,14 +59,14 @@ class BaseJSONWeatherBackend(BaseWeatherBackend):
                         resolved_location = self._parse_geocode(location, json_data)
             else:
                 resolved_location = location
-            request_url = self._get_json_request_url(resolved_location)
+            request_url = self._get_json_request_url(resolved_location, forecast_days=forecast_days)
             headers = headers or DEFAULT_HEADERS
             logger.debug("Using URL %s", request_url)
             async with session.get(request_url) as resp:
                 json_data = await resp.json()
                 return self._format_weather(resolved_location, json_data)
 
-    def get_weather_sync(self, location: Location, timeout=10, headers=None) -> WeatherResponse:
+    def get_weather_sync(self, location: Location, timeout=10, headers=None, forecast_days=0) -> WeatherResponse:
         if isinstance(location, str):
             geocode_url = self._get_json_geocode_url(location)
             if geocode_url:
@@ -74,7 +74,7 @@ class BaseJSONWeatherBackend(BaseWeatherBackend):
                 resolved_location = self._parse_geocode(location, resp.json())
         else:
             resolved_location = location
-        request_url = self._get_json_request_url(resolved_location)
+        request_url = self._get_json_request_url(resolved_location, forecast_days=forecast_days)
         headers = headers or DEFAULT_HEADERS
         logger.debug("Using URL %s", request_url)
         resp = requests.get(request_url, timeout=timeout, headers=headers)

@@ -1,4 +1,5 @@
 import datetime
+import urllib.parse
 import zoneinfo
 
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
@@ -17,10 +18,18 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
         self.api_key = api_key
         self.base_url = base_url
 
-    def _get_json_request_url(self, location):
+    def _get_json_request_url(self, location, forecast_days=0):
         lat, lon = location
-        # Note: default units are US imperial, but this library converts units by itself anyways
-        return f'{self.base_url}/{self.api_key}/{lat},{lon}?units=us&exclude=minutely,hourly,alerts'
+        exclude = ['minutely', 'hourly', 'alerts'] # not used by this library yet
+        if not forecast_days:
+            exclude.append('daily')
+
+        args = {
+            # Default units are US imperial, but this library converts units by itself anyways
+            'units': 'us',
+            'exclude': ','.join(exclude),
+        }
+        return f'{self.base_url}/{self.api_key}/{lat},{lon}?{urllib.parse.urlencode(args)}'
 
     def _format_weather_inner(self, data, tz):
         sunrise = None
@@ -75,8 +84,9 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
 
         current = self._format_weather_inner(data['currently'], tz)
         forecasts = []
-        for forecast_data in data['daily']['data']:
-            forecasts.append(self._format_weather_inner(forecast_data, tz))
+        if 'daily' in data:
+            for forecast_data in data['daily']['data']:
+                forecasts.append(self._format_weather_inner(forecast_data, tz))
 
         resp = WeatherResponse(
             name='Pirate Weather',

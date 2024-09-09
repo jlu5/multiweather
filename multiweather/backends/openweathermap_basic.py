@@ -20,7 +20,7 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
         self.api_key = api_key
         self.base_url = base_url
 
-    def _get_json_request_url(self, location):
+    def _get_json_request_url(self, location, forecast_days=0):
         lat, lon = location
         return f'{self.base_url}?' + urllib.parse.urlencode({
             'appid': self.api_key,
@@ -82,7 +82,9 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
         )
         return resp
 
-    def _get_json_geocode_url(self, location):
+    def _get_json_geocode_url(self, location, forecast_days=0):
+        if forecast_days:
+            raise NotImplementedError("daily forecasts are not implemented for this backend")
         args = {
             'q': location,
             'limit': 1,
