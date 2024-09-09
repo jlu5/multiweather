@@ -10,14 +10,16 @@ A Python weather library supporting multiple backends. Because weather APIs [go]
 
 ### Comparison of sources
 
-| Data Source                                       | Open-Meteo          | OpenWeatherMap    | PirateWeather |
-| ------------------------------------------------- | ------------------- | ----------------- | ------------- |
-| **API Key optional**                              | ✅                  | ❌                | ❌            |
-| **Current conditions**                            | ✅                  | ✅                | ✅            |
-| **Daily (days)**                                  | ✅ (max 16)         | ❌ (paid)         | ✅ (7)        |
-| **Input location as string** (built-in geocoding) | ✅ (city name only) | ✅ (city,country) | ❌            |
+| Data Source            | Open-Meteo             | OpenWeatherMap               | PirateWeather |
+| ---------------------- | ---------------------- | ---------------------------- | ------------- |
+| **API Key optional**   | ✅                     | ❌                           | ❌            |
+| **Current conditions** | ✅                     | ✅                           | ✅            |
+| **Daily (days)**       | ✅ (max 16)            | ❌ (paid only)               | ✅ (7)        |
+| **Built-in geocoding** | ✅ (city name only)    | ✅ (city,country)            | ❌            |
+| **Output license**     | [CC BY 4.0][CC BY 4.0] | [CC BY-SA 4.0][CC BY-SA 4.0] | ❓            |
 
-
+[CC BY 4.0]: https://creativecommons.org/licenses/by/4.0/
+[CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/
 ## Usage
 ```python
 from multiweather import OpenMeteoBackend # or your preferred backend
