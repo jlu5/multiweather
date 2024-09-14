@@ -4,6 +4,7 @@ import zoneinfo
 
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
+    make_distance,
     make_precipitation,
     make_temperature,
     make_wind,
@@ -62,7 +63,7 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
                 speed_mph=data.get('windSpeed'),
                 gust_mph=data.get('windGust')),
             uv_index=data.get('uvIndex'),
-            visibility=data.get('visibility'),
+            visibility=make_distance(mi=data.get('visibility')),
 
             # Only available for forecasts
             sunrise=sunrise,

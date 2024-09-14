@@ -5,6 +5,7 @@ import zoneinfo
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.consts import get_summary_for_wmo_code
 from multiweather.data import (
+    make_distance,
     make_precipitation,
     make_temperature,
     make_wind,
@@ -65,7 +66,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
 
         # These values are not available in "current" conditions
         try:
-            visibility = data['hourly']['visibility'][0]
+            visibility = data['hourly']['visibility'][0] / 1000
         except (KeyError, IndexError):
             visibility = None
         try:
@@ -95,7 +96,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                 speed_kph=current_data.get('wind_speed_10m'),
                 gust_kph=current_data.get('wind_gusts_10m')),
             uv_index=uv_index,
-            visibility=visibility,
+            visibility=make_distance(km=visibility),
 
             # Only available for forecasts
             sunrise=None,
