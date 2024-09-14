@@ -21,6 +21,8 @@ DEFAULT_HEADERS = {
 
 class BaseWeatherBackend(ABC):
     """Base class for weather backends"""
+    SUPPORTS_NATIVE_GEOCODE = False
+
     async def get_weather(self, location) -> WeatherResponse:
         """Fetch weather for <location> from the API (asynchronous)"""
 

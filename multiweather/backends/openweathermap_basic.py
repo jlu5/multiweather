@@ -12,9 +12,10 @@ from multiweather.data import (
     WeatherConditions,
     WeatherResponse,
 )
-from multiweather.exceptions import APIError, GeocodeAPIError
+from multiweather.exceptions import GeocodeAPIError
 
 class OpenWeatherMapBackend(BaseJSONWeatherBackend):
+    SUPPORTS_NATIVE_GEOCODE = True
     def __init__(self, api_key, base_url='https://api.openweathermap.org/data/2.5/weather'):
         """Instantiates the OpenWeatherMap API client"""
         self.api_key = api_key
@@ -82,9 +83,7 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
         )
         return resp
 
-    def _get_json_geocode_url(self, location, forecast_days=0):
-        if forecast_days:
-            raise NotImplementedError("daily forecasts are not implemented for this backend")
+    def _get_json_geocode_url(self, location):
         args = {
             'q': location,
             'limit': 1,

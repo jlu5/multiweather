@@ -14,6 +14,7 @@ from multiweather.data import (
 from multiweather.exceptions import APIError, GeocodeAPIError
 
 class OpenMeteoBackend(BaseJSONWeatherBackend):
+    SUPPORTS_NATIVE_GEOCODE = True
     def __init__(self, api_key=None, base_url=None, fill_current_with_hourly=True):
         """Instantiates the Open-Meteo API client"""
         self.api_key = api_key
