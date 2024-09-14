@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 import aiohttp
 import requests
+from typing import TypeAlias
 
 from multiweather.data import (
     WeatherResponse,
@@ -12,8 +13,8 @@ from multiweather.data import (
 from multiweather.log import logger
 from multiweather.version import __version__
 
-type LatLon = tuple[float, float]
-type Location = LatLon | str
+LatLon: TypeAlias = tuple[float, float]
+Location: TypeAlias = LatLon | str
 
 DEFAULT_HEADERS = {
     'User-Agent': f'Mozilla/5.0 (compatible; python-multiweather/{__version__}) https://github.com/jlu5/multiweather'
