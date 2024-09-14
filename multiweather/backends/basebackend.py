@@ -16,7 +16,7 @@ type LatLon = tuple[float, float]
 type Location = LatLon | str
 
 DEFAULT_HEADERS = {
-    'User-Agent': f'Mozilla/5.0 (compatible; python-multiweather/{__version__})'
+    'User-Agent': f'Mozilla/5.0 (compatible; python-multiweather/{__version__}) https://github.com/jlu5/multiweather'
 }
 
 class BaseWeatherBackend(ABC):
