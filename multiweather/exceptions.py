@@ -3,3 +3,6 @@ class APIError(Exception):
 
 class GeocodeAPIError(APIError):
     """Generic class for geocoding API errors"""
+
+class UnknownBackendError(Exception):
+    """Unknown backend error"""
