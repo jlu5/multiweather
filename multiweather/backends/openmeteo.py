@@ -82,9 +82,9 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             icon=None,
             time=datetime.datetime.fromtimestamp(current_data['time'], tz),
 
-            temperature=make_temperature(f=current_data.get('temperature_2m')),
-            feels_like=make_temperature(f=current_data.get('apparent_temperature')),
-            dew_point=make_temperature(f=current_data.get('dew_point_2m')),
+            temperature=make_temperature(c=current_data.get('temperature_2m')),
+            feels_like=make_temperature(c=current_data.get('apparent_temperature')),
+            dew_point=make_temperature(c=current_data.get('dew_point_2m')),
             humidity=current_data['relative_humidity_2m']/100 if 'relative_humidity_2m' in current_data else None,
             pressure=current_data.get('pressure_msl'),
             precipitation=make_precipitation(
@@ -118,10 +118,10 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                     # TODO: need to translate from WMO codes to icon
                     icon=None,
                     time=daily_forecast_time,
-                    low_temperature=daily_data['temperature_2m_min'][day_index],
-                    high_temperature=daily_data['temperature_2m_max'][day_index],
-                    low_feels_like=daily_data['apparent_temperature_min'][day_index],
-                    high_feels_like=daily_data['apparent_temperature_max'][day_index],
+                    low_temperature=make_temperature(c=daily_data['temperature_2m_min'][day_index]),
+                    high_temperature=make_temperature(c=daily_data['temperature_2m_max'][day_index]),
+                    low_feels_like=make_temperature(c=daily_data['apparent_temperature_min'][day_index]),
+                    high_feels_like=make_temperature(c=daily_data['apparent_temperature_max'][day_index]),
                     precipitation=make_precipitation(
                         mm=daily_data['precipitation_sum'][day_index],
                         percentage=daily_data['precipitation_probability_max'][day_index]/100,
