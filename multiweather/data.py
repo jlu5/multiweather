@@ -5,25 +5,39 @@ import datetime
 
 from multiweather.log import logger
 
+class _WeatherUnit():
+    __slots__ = ()
+    def __bool__(self):
+        for slot in self.__slots__:
+            if getattr(self, slot) is not None:
+                return True
+        return False
+
+    def __eq__(self, other):
+        for slot in self.__slots__:
+            if getattr(self, slot) != getattr(other, slot):
+                return False
+        return True
+
 # pylint: disable=too-few-public-methods
-class Temperature:
+class Temperature(_WeatherUnit):
     """Represents a temperature value"""
     __slots__ = ("c", "f")
     def __init__(self, c=None, f=None):
-        if len(list(filter(lambda x: x is not None, (c, f)))) != 1:
-            raise ValueError("Exactly one of 'c' and 'f' must be specified")
+        if c is not None and f is not None:
+            raise ValueError("Exactly one of 'c' and 'f' can be specified")
         if c is not None:
             self.c = float(c)
             self.f = self.c * 9/5 + 32
-        else:
+        elif f is not None:
             self.f = float(f)
             self.c = (self.f - 32) * 5/9
+        else:
+            self.c = None
+            self.f = None
 
     def __repr__(self):
         return f'<Temperature {self.c}C / {self.f}F>'
-
-    def __eq__(self, other):
-        return self.c == other.c and self.f == other.f
 
 def make_temperature(f=None, c=None) -> Temperature | None:
     """Convenience method to create a Temperature, or None if the data is missing"""
@@ -33,24 +47,24 @@ def make_temperature(f=None, c=None) -> Temperature | None:
         return Temperature(c=c)
     return None
 
-class Distance:
+class Distance(_WeatherUnit):
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
     def __init__(self, km=None, mi=None):
-        if len(list(filter(lambda x: x is not None, (km, mi)))) != 1:
-            raise ValueError("Exactly one of 'km', 'mi' must be specified")
+        if km is not None and mi is not None:
+            raise ValueError("Exactly one of 'km', 'mi' can be specified")
         if km is not None:
             self.km = float(km)
             self.mi = self.km / 1.609
-        else:
+        elif mi is not None:
             self.mi = float(mi)
             self.km = self.mi * 1.609
+        else:
+            self.mi = None
+            self.km = None
 
     def __repr__(self):
         return f'<Distance {self.km}km / {self.mi}mi>'
-
-    def __eq__(self, other):
-        return self.km == other.km and self.mi == other.mi
 
 def make_distance(mi=None, km=None) -> Distance | None:
     """Convenience method to create a Distance, or None if the data is missing"""
@@ -60,7 +74,7 @@ def make_distance(mi=None, km=None) -> Distance | None:
         return Distance(km=km)
     return None
 
-class Speed:
+class Speed(_WeatherUnit):
     """Represents a speed value (wind speed, etc.)"""
     __slots__ = (
         # kilometers per hour
@@ -71,8 +85,8 @@ class Speed:
         "ms"
     )
     def __init__(self, kph=None, mph=None, ms=None):
-        if len(list(filter(lambda x: x is not None, (kph, mph, ms)))) != 1:
-            raise ValueError("Exactly one of 'kph', 'mph' and 'ms' must be specified")
+        if len(list(filter(lambda x: x is not None, (kph, mph, ms)))) > 1:
+            raise ValueError("Exactly one of 'kph', 'mph' and 'ms' can be specified")
         if kph is not None:
             self.kph = float(kph)
             self.mph = self.kph / 1.609
@@ -81,18 +95,19 @@ class Speed:
             self.mph = float(mph)
             self.kph = self.mph * 1.609
             self.ms = self.kph / 3.6
-        else:
+        elif ms is not None:
             self.ms = float(ms)
             self.kph = self.ms * 3.6
             self.mph = self.kph / 1.609
+        else:
+            self.kph = None
+            self.mph = None
+            self.ms = None
 
     def __repr__(self):
         return f'<Speed {self.kph}kph / {self.mph}mph / {self.ms}m/s>'
 
-    def __eq__(self, other):
-        return self.kph == other.kph and self.mph == other.mph and self.ms == other.ms
-
-class Precipitation:
+class Precipitation(_WeatherUnit):
     """Represents a precipitation value (amount and percentage)"""
     __slots__ = ("percentage", "mm", "inches")
     def __init__(self, percentage=None, mm=None, inches=None):
@@ -100,20 +115,20 @@ class Precipitation:
             raise ValueError(f"Invalid percentage value {percentage}")
         self.percentage = percentage
 
-        if len(list(filter(lambda x: x is not None, (mm, inches)))) != 1:
-            raise ValueError("Exactly one of 'mm', 'inches' must be specified")
+        if mm is not None and inches is not None:
+            raise ValueError("Exactly one of 'mm', 'inches' can be specified")
         if mm is not None:
             self.mm = float(mm)
             self.inches = self.mm / 25.4
-        else:
+        elif inches is not None:
             self.inches = float(inches)
             self.mm = self.inches * 25.4
+        else:
+            self.mm = None
+            self.inches = None
 
     def __repr__(self):
         return f'<Precipitation {self.mm}mm / {self.inches}in {self.percentage}%>'
-
-    def __eq__(self, other):
-        return self.percentage == other.percentage and self.mm == other.mm and self.inches == other.inches
 
 def make_precipitation(percentage=None, mm=None, inches=None) -> Precipitation | None:
     """Convenience method to create a Precipitation, or None if the data is missing"""
