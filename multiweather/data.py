@@ -39,14 +39,6 @@ class Temperature(_WeatherUnit):
     def __repr__(self):
         return f'<Temperature {self.c}C / {self.f}F>'
 
-def make_temperature(f=None, c=None) -> Temperature | None:
-    """Convenience method to create a Temperature, or None if the data is missing"""
-    if f is not None:
-        return Temperature(f=f)
-    if c is not None:
-        return Temperature(c=c)
-    return None
-
 class Distance(_WeatherUnit):
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
@@ -65,14 +57,6 @@ class Distance(_WeatherUnit):
 
     def __repr__(self):
         return f'<Distance {self.km}km / {self.mi}mi>'
-
-def make_distance(mi=None, km=None) -> Distance | None:
-    """Convenience method to create a Distance, or None if the data is missing"""
-    if mi is not None:
-        return Distance(mi=mi)
-    if km is not None:
-        return Distance(km=km)
-    return None
 
 class Speed(_WeatherUnit):
     """Represents a speed value (wind speed, etc.)"""
@@ -129,15 +113,6 @@ class Precipitation(_WeatherUnit):
 
     def __repr__(self):
         return f'<Precipitation {self.mm}mm / {self.inches}in {self.percentage}%>'
-
-def make_precipitation(percentage=None, mm=None, inches=None) -> Precipitation | None:
-    """Convenience method to create a Precipitation, or None if the data is missing"""
-    if mm is not None:
-        return Precipitation(percentage=percentage, mm=mm)
-    if inches is not None:
-        return Precipitation(percentage=percentage, inches=inches)
-    logger.debug("missing precipitation amount")
-    return None
 
 @dataclass
 class WindConditions:

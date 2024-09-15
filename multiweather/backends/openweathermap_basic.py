@@ -6,8 +6,8 @@ import urllib.parse
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
     Distance,
-    make_precipitation,
-    make_temperature,
+    Precipitation,
+    Temperature,
     make_wind,
     WeatherConditions,
     WeatherResponse,
@@ -37,17 +37,17 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
             'lon': lon,
             'zoom': 12
         })
-        precipitation = make_precipitation(percentage=None, mm=0)
+        precipitation = Precipitation(percentage=None, mm=0)
         if rain := data.get('rain'):
             if rain1h := rain.get('1h'):
-                precipitation = make_precipitation(percentage=None, mm=rain1h)
+                precipitation = Precipitation(percentage=None, mm=rain1h)
             elif rain3h := rain.get('3h'):
-                precipitation = make_precipitation(percentage=None, mm=rain3h)
+                precipitation = Precipitation(percentage=None, mm=rain3h)
         elif snow := data.get('snow'):
             if snow1h := snow.get('1h'):
-                precipitation = make_precipitation(percentage=None, mm=snow1h)
+                precipitation = Precipitation(percentage=None, mm=snow1h)
             elif snow3h := snow.get('3h'):
-                precipitation = make_precipitation(percentage=None, mm=snow3h)
+                precipitation = Precipitation(percentage=None, mm=snow3h)
 
         tz = datetime.timezone(datetime.timedelta(seconds=data['timezone']))
         icon = f"https://openweathermap.org/img/wn/{data['weather'][0]['icon']}@2x.png"
@@ -56,8 +56,8 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
             weather_code=data['weather'][0]['id'],
             icon=icon,
             time=datetime.datetime.fromtimestamp(data['dt'], tz),
-            temperature=make_temperature(c=data['main']['temp']),
-            feels_like=make_temperature(c=data['main']['feels_like']),
+            temperature=Temperature(c=data['main']['temp']),
+            feels_like=Temperature(c=data['main']['feels_like']),
             humidity=data['main']['humidity']/100,
             pressure=data['main']['pressure'],
             precipitation=precipitation,
@@ -67,8 +67,8 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
             sunrise=datetime.datetime.fromtimestamp(data['sys']['sunrise'], tz),
             sunset=datetime.datetime.fromtimestamp(data['sys']['sunset'], tz),
             # For large areas
-            low_temperature=make_temperature(c=data['main'].get('temp_min')),
-            high_temperature=make_temperature(c=data['main'].get('temp_high')),
+            low_temperature=Temperature(c=data['main'].get('temp_min')),
+            high_temperature=Temperature(c=data['main'].get('temp_high')),
             # Not available
             dew_point=None,
             uv_index=None,

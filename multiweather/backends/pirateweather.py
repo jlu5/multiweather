@@ -4,9 +4,9 @@ import zoneinfo
 
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
-    make_distance,
-    make_precipitation,
-    make_temperature,
+    Distance,
+    Precipitation,
+    Temperature,
     make_wind,
     WeatherConditions,
     WeatherResponse,
@@ -48,12 +48,12 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             weather_code=data['icon'],
             time=datetime.datetime.fromtimestamp(data['time'], tz),
 
-            temperature=make_temperature(f=data.get('temperature')),
-            feels_like=make_temperature(f=data.get('apparentTemperature')),
-            dew_point=make_temperature(f=data.get('dewPoint')),
+            temperature=Temperature(f=data.get('temperature')),
+            feels_like=Temperature(f=data.get('apparentTemperature')),
+            dew_point=Temperature(f=data.get('dewPoint')),
             humidity=data.get('humidity'),
             pressure=data.get('pressure'),
-            precipitation=make_precipitation(
+            precipitation=Precipitation(
                 percentage=data.get('precipProbability'),
                 inches=data.get('precipIntensity')
             ),
@@ -63,15 +63,15 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
                 speed_mph=data.get('windSpeed'),
                 gust_mph=data.get('windGust')),
             uv_index=data.get('uvIndex'),
-            visibility=make_distance(mi=data.get('visibility')),
+            visibility=Distance(mi=data.get('visibility')),
 
             # Only available for forecasts
             sunrise=sunrise,
             sunset=sunset,
-            low_temperature=make_temperature(f=data.get('temperatureLow')),
-            high_temperature=make_temperature(f=data.get('temperatureHigh')),
-            low_feels_like=make_temperature(f=data.get('apparentTemperatureLow')),
-            high_feels_like=make_temperature(f=data.get('apparentTemperatureHigh')),
+            low_temperature=Temperature(f=data.get('temperatureLow')),
+            high_temperature=Temperature(f=data.get('temperatureHigh')),
+            low_feels_like=Temperature(f=data.get('apparentTemperatureLow')),
+            high_feels_like=Temperature(f=data.get('apparentTemperatureHigh')),
         )
 
     def _format_weather(self, location, data):

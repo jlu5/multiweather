@@ -5,9 +5,9 @@ import zoneinfo
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.consts import get_summary_for_wmo_code
 from multiweather.data import (
-    make_distance,
-    make_precipitation,
-    make_temperature,
+    Distance,
+    Precipitation,
+    Temperature,
     make_wind,
     WeatherConditions,
     WeatherResponse,
@@ -82,12 +82,12 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             icon=None,
             time=datetime.datetime.fromtimestamp(current_data['time'], tz),
 
-            temperature=make_temperature(c=current_data.get('temperature_2m')),
-            feels_like=make_temperature(c=current_data.get('apparent_temperature')),
-            dew_point=make_temperature(c=current_data.get('dew_point_2m')),
+            temperature=Temperature(c=current_data.get('temperature_2m')),
+            feels_like=Temperature(c=current_data.get('apparent_temperature')),
+            dew_point=Temperature(c=current_data.get('dew_point_2m')),
             humidity=current_data['relative_humidity_2m']/100 if 'relative_humidity_2m' in current_data else None,
             pressure=current_data.get('pressure_msl'),
-            precipitation=make_precipitation(
+            precipitation=Precipitation(
                 mm=current_data.get('precipitation')
             ),
             cloud_cover=current_data['cloud_cover']/100 if 'cloud_cover' in current_data else None,
@@ -96,7 +96,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                 speed_kph=current_data.get('wind_speed_10m'),
                 gust_kph=current_data.get('wind_gusts_10m')),
             uv_index=uv_index,
-            visibility=make_distance(km=visibility),
+            visibility=Distance(km=visibility),
 
             # Only available for forecasts
             sunrise=None,
@@ -118,11 +118,11 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                     # TODO: need to translate from WMO codes to icon
                     icon=None,
                     time=daily_forecast_time,
-                    low_temperature=make_temperature(c=daily_data['temperature_2m_min'][day_index]),
-                    high_temperature=make_temperature(c=daily_data['temperature_2m_max'][day_index]),
-                    low_feels_like=make_temperature(c=daily_data['apparent_temperature_min'][day_index]),
-                    high_feels_like=make_temperature(c=daily_data['apparent_temperature_max'][day_index]),
-                    precipitation=make_precipitation(
+                    low_temperature=Temperature(c=daily_data['temperature_2m_min'][day_index]),
+                    high_temperature=Temperature(c=daily_data['temperature_2m_max'][day_index]),
+                    low_feels_like=Temperature(c=daily_data['apparent_temperature_min'][day_index]),
+                    high_feels_like=Temperature(c=daily_data['apparent_temperature_max'][day_index]),
+                    precipitation=Precipitation(
                         mm=daily_data['precipitation_sum'][day_index],
                         percentage=daily_data['precipitation_probability_max'][day_index]/100,
                     ),
