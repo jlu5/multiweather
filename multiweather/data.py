@@ -49,8 +49,10 @@ class _WeatherUnit():
         attrs = self._format_attrs(decimal_places=decimal_places)
         return tmpl.substitute(attrs)
 
-    def __str__(self):
-        return self.format() if self._DEFAULT_TEMPLATE else self.__repr__()
+    __str__ = format
+
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.format()})'
 
 # pylint: disable=too-few-public-methods
 class Temperature(_WeatherUnit):
@@ -71,9 +73,6 @@ class Temperature(_WeatherUnit):
             self.c = None
             self.f = None
 
-    def __repr__(self):
-        return f'<Temperature {self.c}C / {self.f}F>'
-
 class Distance(_WeatherUnit):
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
@@ -91,9 +90,6 @@ class Distance(_WeatherUnit):
         else:
             self.mi = None
             self.km = None
-
-    def __repr__(self):
-        return f'<Distance {self.km}km / {self.mi}mi>'
 
 class Speed(_WeatherUnit):
     """Represents a speed value (wind speed, etc.)"""
@@ -127,9 +123,6 @@ class Speed(_WeatherUnit):
             self.mph = None
             self.ms = None
 
-    def __repr__(self):
-        return f'<Speed {self.kph}kph / {self.mph}mph / {self.ms}m/s>'
-
 class Precipitation(_WeatherUnit):
     """Represents a precipitation value (amount and percentage)"""
     __slots__ = ("percentage", "mm", "inches")
@@ -157,9 +150,6 @@ class Precipitation(_WeatherUnit):
         else:
             self.mm = None
             self.inches = None
-
-    def __repr__(self):
-        return f'<Precipitation {self.mm}mm / {self.inches}in {self.percentage}%>'
 
 class Direction(_WeatherUnit):
     """Represents a direction, input as meterological angles"""
