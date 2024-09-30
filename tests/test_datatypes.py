@@ -18,18 +18,23 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(temp1.c, 20)
         self.assertEqual(temp1.f, 68)
         self.assertTrue(temp1)
+        self.assertEqual(temp1.format(), "20.0C / 68.0F")
+        self.assertEqual(temp1.format("${c}°C"), "20.0°C")
 
         temp2 = Temperature(f=80)
         self.assertEqual(temp2.f, 80)
         self.assertEqual(temp2.c, 26.666666666666667)
         self.assertTrue(temp2)
+        self.assertEqual(temp2.format(decimal_places=2), "26.67C / 80.00F")
 
         temp_null = Temperature()
         self.assertFalse(temp_null)
+        self.assertEqual(temp_null.format(), "<null>")
 
         # zero values should be accepted
         temp3 = Temperature(c=0)
         self.assertTrue(temp3)
+        self.assertEqual(temp3.format(), "0.0C / 32.0F")
         temp4 = Temperature(f=0)
         self.assertTrue(temp4)
 
@@ -46,19 +51,24 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(dist1.km, 100)
         self.assertEqual(dist1.mi, 100/1.609)
         self.assertTrue(dist1)
+        self.assertEqual(dist1.format(), "100.0km / 62.2mi")
 
         dist2 = Distance(mi=200)
         self.assertEqual(dist2.km, 200*1.609)
         self.assertEqual(dist2.mi, 200)
         self.assertTrue(dist2)
+        self.assertEqual(dist2.format(), "321.8km / 200.0mi")
 
         dist3 = Distance(km=0)
         dist4 = Distance(mi=0)
         self.assertTrue(dist3)
         self.assertTrue(dist4)
+        self.assertEqual(dist3, dist4)
+        self.assertEqual(dist3.format(), "0.0km / 0.0mi")
 
         dist_null = Distance()
         self.assertFalse(dist_null)
+        self.assertEqual(dist_null.format(), "<null>")
 
         with self.assertRaises(ValueError):
             Distance(km=1, mi=1)
@@ -73,12 +83,14 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(speed1.mph, 100/1.609)
         self.assertEqual(speed1.ms, 100/3.6)
         self.assertTrue(speed1)
+        self.assertEqual(speed1.format(), "100.0kph / 62.2mph / 27.8m/s")
 
         speed2 = Speed(mph=200)
         self.assertEqual(speed2.kph, 200*1.609)
         self.assertEqual(speed2.mph, 200)
         self.assertEqual(speed2.ms, speed2.kph/3.6)
         self.assertTrue(speed2)
+        self.assertEqual(speed2.format(), "321.8kph / 200.0mph / 89.4m/s")
 
         speed3 = Speed(ms=360)
         self.assertEqual(speed3.ms, 360)
@@ -88,6 +100,7 @@ class TestDataTypes(unittest.TestCase):
 
         speed4 = Speed(kph=0)
         self.assertTrue(speed4)
+        self.assertEqual(speed4.format(), "0.0kph / 0.0mph / 0.0m/s")
 
         with self.assertRaises(ValueError):
             Speed(kph=1, mph=2)
@@ -104,25 +117,30 @@ class TestDataTypes(unittest.TestCase):
 
         speed_null = Speed()
         self.assertFalse(speed_null)
+        self.assertEqual(speed_null.format(), "<null>")
 
     def test_precipitation(self):
-        precip1 = Precipitation(0.8, mm=50.8)
+        precip1 = Precipitation(80, mm=50.8)
         self.assertTrue(precip1)
         self.assertEqual(precip1.mm, 50.8)
         self.assertEqual(precip1.inches, 2)
-        self.assertEqual(precip1, Precipitation(0.8, inches=2))
+        self.assertEqual(precip1, Precipitation(80, inches=2))
+        self.assertEqual(precip1.format(), "50.8mm / 2.0in (80.0%)")
 
-        precip2 = Precipitation(0.5, inches=1)
+        precip2 = Precipitation(55.5, inches=1)
         self.assertTrue(precip2)
         self.assertEqual(precip2.mm, 25.4)
         self.assertEqual(precip2.inches, 1)
+        self.assertEqual(precip2.format(), "25.4mm / 1.0in (55.5%)")
 
         precip3 = Precipitation(None, inches=1)
-        self.assertTrue(precip2)
+        self.assertTrue(precip3)
         self.assertNotEqual(precip2, precip3)
+        self.assertEqual(precip3.format(), "25.4mm / 1.0in")
 
         precip_null = Precipitation()
         self.assertFalse(precip_null)
+        self.assertEqual(precip_null.format(), "<null>")
 
 if __name__ == '__main__':
     unittest.main()

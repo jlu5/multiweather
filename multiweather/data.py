@@ -2,11 +2,15 @@
 
 from dataclasses import dataclass, field
 import datetime
+import string
 
 from multiweather.log import logger
 
 class _WeatherUnit():
     __slots__ = ()
+    _DEFAULT_TEMPLATE = None
+    _NULL_VALUE_DISPLAY = '<null>'
+
     def __bool__(self):
         for slot in self.__slots__:
             if getattr(self, slot) is not None:
@@ -19,10 +23,41 @@ class _WeatherUnit():
                 return False
         return True
 
+    def _format_attrs(self, decimal_places):
+        attrs = {}
+        for attr in self.__slots__:
+            value = getattr(self, attr)
+            if isinstance(value, (int, float)):
+                attrs[attr] = f'{value:.{decimal_places}f}'
+            else:
+                attrs[attr] = value
+        return attrs
+
+    def format(self, template_str=None, decimal_places=1):
+        """
+        Format the weather unit using template_str (or the class' default
+        template string), with any float values fixed to decimal_places decimal
+        places.
+        """
+        if not self:
+            return self._NULL_VALUE_DISPLAY
+        if template_str is None:
+            if self._DEFAULT_TEMPLATE is None:
+                raise ValueError("Template string missing")
+            template_str = self._DEFAULT_TEMPLATE
+        tmpl = string.Template(template_str)
+        attrs = self._format_attrs(decimal_places=decimal_places)
+        return tmpl.substitute(attrs)
+
+    def __str__(self):
+        return self.format() if self._DEFAULT_TEMPLATE else self.__repr__()
+
 # pylint: disable=too-few-public-methods
 class Temperature(_WeatherUnit):
     """Represents a temperature value"""
     __slots__ = ("c", "f")
+    _DEFAULT_TEMPLATE = "${c}C / ${f}F"
+
     def __init__(self, c=None, f=None):
         if c is not None and f is not None:
             raise ValueError("Exactly one of 'c' and 'f' can be specified")
@@ -42,6 +77,8 @@ class Temperature(_WeatherUnit):
 class Distance(_WeatherUnit):
     """Represents a distance value (visibility, etc.)"""
     __slots__ = ("km", "mi")
+    _DEFAULT_TEMPLATE = "${km}km / ${mi}mi"
+
     def __init__(self, km=None, mi=None):
         if km is not None and mi is not None:
             raise ValueError("Exactly one of 'km', 'mi' can be specified")
@@ -68,6 +105,8 @@ class Speed(_WeatherUnit):
         # meters per second
         "ms"
     )
+    _DEFAULT_TEMPLATE = "${kph}kph / ${mph}mph / ${ms}m/s"
+
     def __init__(self, kph=None, mph=None, ms=None):
         if len(list(filter(lambda x: x is not None, (kph, mph, ms)))) > 1:
             raise ValueError("Exactly one of 'kph', 'mph' and 'ms' can be specified")
@@ -94,6 +133,14 @@ class Speed(_WeatherUnit):
 class Precipitation(_WeatherUnit):
     """Represents a precipitation value (amount and percentage)"""
     __slots__ = ("percentage", "mm", "inches")
+
+    @property
+    def _DEFAULT_TEMPLATE(self):  # pylint: disable=invalid-name
+        tmpl = "${mm}mm / ${inches}in"
+        if self.percentage is not None:
+            tmpl += " (${percentage}%)"
+        return tmpl
+
     def __init__(self, percentage=None, mm=None, inches=None):
         if percentage is not None and not 0 <= percentage <= 100:
             raise ValueError(f"Invalid percentage value {percentage}")
