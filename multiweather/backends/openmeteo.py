@@ -85,12 +85,12 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             temperature=Temperature(c=current_data.get('temperature_2m')),
             feels_like=Temperature(c=current_data.get('apparent_temperature')),
             dew_point=Temperature(c=current_data.get('dew_point_2m')),
-            humidity=current_data['relative_humidity_2m']/100 if 'relative_humidity_2m' in current_data else None,
+            humidity=current_data.get('relative_humidity_2m'),
             pressure=current_data.get('pressure_msl'),
             precipitation=Precipitation(
                 mm=current_data.get('precipitation')
             ),
-            cloud_cover=current_data['cloud_cover']/100 if 'cloud_cover' in current_data else None,
+            cloud_cover=current_data.get('cloud_cover'),
             wind=make_wind(
                 direction=current_data.get('wind_direction_10m'),
                 speed_kph=current_data.get('wind_speed_10m'),
@@ -124,7 +124,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                     high_feels_like=Temperature(c=daily_data['apparent_temperature_max'][day_index]),
                     precipitation=Precipitation(
                         mm=daily_data['precipitation_sum'][day_index],
-                        percentage=daily_data['precipitation_probability_max'][day_index]/100,
+                        percentage=daily_data['precipitation_probability_max'][day_index],
                     ),
                     wind=make_wind(
                         direction=daily_data['wind_direction_10m_dominant'][day_index],

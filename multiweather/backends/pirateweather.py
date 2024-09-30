@@ -41,6 +41,16 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
         if sunset_ts := data.get('sunsetTime'):
             sunset = datetime.datetime.fromtimestamp(sunset_ts, tz)
 
+        humidity = data.get('humidity')
+        if humidity:
+            humidity *= 100
+        cloud_cover = data.get('cloudCover')
+        if cloud_cover:
+            cloud_cover *= 100
+        precip_prob = data.get('precipProbability')
+        if precip_prob:
+            precip_prob *= 100
+
         return WeatherConditions(
             summary=data.get('summary'),
             # TODO: icons are provided as names, need to find a URL for them
@@ -51,13 +61,13 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             temperature=Temperature(f=data.get('temperature')),
             feels_like=Temperature(f=data.get('apparentTemperature')),
             dew_point=Temperature(f=data.get('dewPoint')),
-            humidity=data.get('humidity'),
+            humidity=humidity,
             pressure=data.get('pressure'),
             precipitation=Precipitation(
-                percentage=data.get('precipProbability'),
+                percentage=precip_prob,
                 inches=data.get('precipIntensity')
             ),
-            cloud_cover=data.get('cloud_cover'),
+            cloud_cover=cloud_cover,
             wind=make_wind(
                 direction=data.get('windBearing'),
                 speed_mph=data.get('windSpeed'),

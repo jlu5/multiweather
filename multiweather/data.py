@@ -95,7 +95,7 @@ class Precipitation(_WeatherUnit):
     """Represents a precipitation value (amount and percentage)"""
     __slots__ = ("percentage", "mm", "inches")
     def __init__(self, percentage=None, mm=None, inches=None):
-        if percentage is not None and not 0 <= percentage <= 1:
+        if percentage is not None and not 0 <= percentage <= 100:
             raise ValueError(f"Invalid percentage value {percentage}")
         self.percentage = percentage
 
@@ -171,14 +171,14 @@ class WeatherConditions:
     feels_like: Temperature | None
     # Dew point:
     dew_point: Temperature | None
-    # Humidity (percentage value between 0 and 1)
+    # Humidity (stored as values between 0 and 100)
     humidity: float | None
     # Atmospheric pressure (hPa)
     pressure: float | None
 
     # Precipitation
     precipitation: Precipitation | None
-    # Cloud coverage percentage
+    # Cloud coverage percentage (stored as values between 0 and 100)
     cloud_cover: float | None
 
     wind: WindConditions | None
