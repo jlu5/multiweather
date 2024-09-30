@@ -3,6 +3,7 @@
 import unittest
 
 from multiweather.data import (
+    Direction,
     Distance,
     Precipitation,
     Speed,
@@ -141,6 +142,56 @@ class TestDataTypes(unittest.TestCase):
         precip_null = Precipitation()
         self.assertFalse(precip_null)
         self.assertEqual(precip_null.format(), "<null>")
+
+    def test_direction(self):
+        dir1 = Direction(0)
+        self.assertTrue(dir1)
+        self.assertEqual(dir1.direction, "N")
+        self.assertEqual(dir1.format(), "N")
+        self.assertEqual(dir1, Direction(0))
+        self.assertEqual(dir1, Direction(360))
+        self.assertEqual(dir1, Direction(-360))
+
+        # Same display direction but different angle value
+        dir2 = Direction(5)
+        self.assertEqual(dir2.direction, "N")
+        self.assertEqual(dir2.format(), "N")
+        self.assertNotEqual(dir1, dir2)
+        self.assertEqual(dir2, Direction(360*2+5))  # auto normalize
+
+        # Default constructor points to north (0 deg)
+        dir_null = Direction()
+        self.assertEqual(dir_null.format(), "N")
+        self.assertTrue(dir_null)
+
+        # Test rounding to the nearest direction
+        self.assertEqual(Direction(22.5).direction, "NNE")
+        self.assertEqual(Direction(22.5+11.2).direction, "NNE")
+        self.assertEqual(Direction(22.5+11.3).direction, "NE")
+
+        self.assertEqual(Direction(45).direction, "NE")
+        self.assertEqual(Direction(45+11.2).direction, "NE")
+        self.assertEqual(Direction(45+11.3).direction, "ENE")
+
+        self.assertEqual(Direction(67.5).direction, "ENE")
+        self.assertEqual(Direction(67.5+11.2).direction, "ENE")
+        self.assertEqual(Direction(67.5+11.3).direction, "E")
+
+        self.assertEqual(Direction(90).direction, "E")
+        self.assertEqual(Direction(90+11.2).direction, "E")
+        self.assertEqual(Direction(90+11.3).direction, "ESE")
+
+        self.assertEqual(Direction(180).direction, "S")
+        self.assertEqual(Direction(180+11.2).direction, "S")
+        self.assertEqual(Direction(180+11.3).direction, "SSW")
+
+        self.assertEqual(Direction(225).direction, "SW")
+        self.assertEqual(Direction(225+11.2).direction, "SW")
+        self.assertEqual(Direction(225+11.3).direction, "WSW")
+
+        self.assertEqual(Direction(270).direction, "W")
+        self.assertEqual(Direction(270+11.2).direction, "W")
+        self.assertEqual(Direction(270+11.3).direction, "WNW")
 
 if __name__ == '__main__':
     unittest.main()

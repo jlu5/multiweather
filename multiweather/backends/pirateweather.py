@@ -4,6 +4,7 @@ import zoneinfo
 
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
+    Direction,
     Distance,
     Precipitation,
     Temperature,
@@ -69,7 +70,7 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             ),
             cloud_cover=cloud_cover,
             wind=make_wind(
-                direction=data.get('windBearing'),
+                direction=Direction(data.get('windBearing')),
                 speed_mph=data.get('windSpeed'),
                 gust_mph=data.get('windGust')),
             uv_index=data.get('uvIndex'),

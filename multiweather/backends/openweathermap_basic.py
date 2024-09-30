@@ -5,6 +5,7 @@ import urllib.parse
 
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.data import (
+    Direction,
     Distance,
     Precipitation,
     Temperature,
@@ -62,7 +63,7 @@ class OpenWeatherMapBackend(BaseJSONWeatherBackend):
             pressure=data['main']['pressure'],
             precipitation=precipitation,
             cloud_cover=data['clouds']['all'],
-            wind=make_wind(data['wind']['deg'], speed_ms=data['wind']['speed'], gust_ms=data['wind'].get('gust')),
+            wind=make_wind(Direction(data['wind']['deg']), speed_ms=data['wind']['speed'], gust_ms=data['wind'].get('gust')),
             visibility=Distance(km=data['visibility']/1000),
             sunrise=datetime.datetime.fromtimestamp(data['sys']['sunrise'], tz),
             sunset=datetime.datetime.fromtimestamp(data['sys']['sunset'], tz),

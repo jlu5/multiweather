@@ -161,6 +161,30 @@ class Precipitation(_WeatherUnit):
     def __repr__(self):
         return f'<Precipitation {self.mm}mm / {self.inches}in {self.percentage}%>'
 
+class Direction(_WeatherUnit):
+    """Represents a direction, input as meterological angles"""
+    __slots__ = ("angle", "direction")
+    _DEFAULT_TEMPLATE = "$direction"
+
+    def __init__(self, angle=None):
+        self.angle = angle
+        if angle is not None:
+            self.angle = angle % 360
+        self.direction = self._get_direction()
+
+    def _get_direction(self):
+        """Returns wind direction (N, W, S, E, etc.) given an angle."""
+        directions = (
+            'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'
+        )
+        if self.angle is None:
+            return directions[0]
+
+        assert 0 <= self.angle < 360  # angle is already normalized
+        angle_step = 360.0 / len(directions)
+        idx = round(self.angle / angle_step)
+        return directions[idx]
+
 @dataclass
 class WindConditions:
     """Represents wind conditions (speed, gust, and direction)"""
@@ -169,7 +193,7 @@ class WindConditions:
     # Wind gust
     gust: Speed | None
     # Direction in meteorological angles
-    direction: float
+    direction: Direction
 
 def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph=None,
               speed_ms=None, gust_ms=None) -> WindConditions | None:
@@ -177,7 +201,6 @@ def make_wind(direction, speed_mph=None, speed_kph=None, gust_mph=None, gust_kph
     if direction is None:
         logger.debug("missing wind angle")
         return None
-    direction = float(direction)
     if speed_mph is not None:
         return WindConditions(
             speed=Speed(mph=speed_mph),

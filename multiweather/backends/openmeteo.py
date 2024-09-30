@@ -5,6 +5,7 @@ import zoneinfo
 from multiweather.backends.basebackend import BaseJSONWeatherBackend
 from multiweather.consts import get_summary_for_wmo_code
 from multiweather.data import (
+    Direction,
     Distance,
     Precipitation,
     Temperature,
@@ -92,7 +93,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
             ),
             cloud_cover=current_data.get('cloud_cover'),
             wind=make_wind(
-                direction=current_data.get('wind_direction_10m'),
+                direction=Direction(current_data.get('wind_direction_10m')),
                 speed_kph=current_data.get('wind_speed_10m'),
                 gust_kph=current_data.get('wind_gusts_10m')),
             uv_index=uv_index,
@@ -127,7 +128,7 @@ class OpenMeteoBackend(BaseJSONWeatherBackend):
                         percentage=daily_data['precipitation_probability_max'][day_index],
                     ),
                     wind=make_wind(
-                        direction=daily_data['wind_direction_10m_dominant'][day_index],
+                        direction=Direction(daily_data['wind_direction_10m_dominant'][day_index]),
                         speed_kph=daily_data['wind_speed_10m_max'][day_index],
                         gust_kph=daily_data['wind_gusts_10m_max'][day_index],
                     ),
