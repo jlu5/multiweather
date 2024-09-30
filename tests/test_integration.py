@@ -2,6 +2,7 @@
 """Integration tests for weather backends"""
 import dataclasses
 import datetime
+import logging
 import os
 import typing
 import unittest
@@ -15,6 +16,8 @@ import multiweather.data
 
 API_KEY_OPENWEATHERMAP = os.environ.get('API_KEY_OPENWEATHERMAP')
 API_KEY_PIRATEWEATHER = os.environ.get('API_KEY_PIRATEWEATHER')
+
+logger = logging.getLogger('multiweather.test_integration')
 
 class BaseTestCase:
     # This is defined at a different level to prevent unittest from running the base class
@@ -50,6 +53,7 @@ class BaseTestCase:
 
         def _smoke_test_weather(self, weatherdata, forecast_days=0):
             """Run basic checks on the weather data (independent of the actual reported values)"""
+            logger.debug("Weather output: %s", weatherdata)
             self.assertLessEqual(
                 abs(datetime.datetime.now(datetime.UTC) - weatherdata.current.time),
                 self.MAX_TIME_DRIFT,
