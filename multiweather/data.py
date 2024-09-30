@@ -183,7 +183,7 @@ class Direction(_WeatherUnit):
         assert 0 <= self.angle < 360  # angle is already normalized
         angle_step = 360.0 / len(directions)
         idx = round(self.angle / angle_step)
-        return directions[idx]
+        return directions[idx % len(directions)]
 
 @dataclass
 class WindConditions:

@@ -193,5 +193,7 @@ class TestDataTypes(unittest.TestCase):
         self.assertEqual(Direction(270+11.2).direction, "W")
         self.assertEqual(Direction(270+11.3).direction, "WNW")
 
+        self.assertEqual(Direction(359).direction, "N")
+
 if __name__ == '__main__':
     unittest.main()
