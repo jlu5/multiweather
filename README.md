@@ -1,6 +1,6 @@
 # multiweather
 
-A Python weather library supporting multiple backends. Because weather APIs [go](https://www.reddit.com/r/webdev/comments/8tjavu) [away](https://www.reddit.com/r/androidapps/comments/1aoz984/), and you shouldn't have to rewrite your code each time.
+A Python weather library supporting multiple backends. Because APIs [go](https://www.reddit.com/r/webdev/comments/8tjavu) [away](https://www.reddit.com/r/androidapps/comments/1aoz984/), and you shouldn't have to rewrite your code each time.
 
 ## Currently supported
 
@@ -20,13 +20,15 @@ A Python weather library supporting multiple backends. Because weather APIs [go]
 
 [CC BY 4.0]: https://creativecommons.org/licenses/by/4.0/
 [CC BY-SA 4.0]: https://creativecommons.org/licenses/by-sa/4.0/
+
 ## Usage
+
 ```python
 from multiweather import OpenMeteoBackend # or your preferred backend
 
-om = OpenMeteoBackend() # pass api_key=... for those backends require one
+om = OpenMeteoBackend() # pass api_key=... for backends that require one
 
-# Blocking fetcher
+# Blocking call
 weather = om.get_weather_sync((lat, lon))
 
 # Or in an async context
