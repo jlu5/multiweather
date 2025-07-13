@@ -53,7 +53,7 @@ class PirateWeatherBackend(BaseJSONWeatherBackend):
             precip_prob *= 100
 
         return WeatherConditions(
-            summary=data.get('summary'),
+            summary=data.get('summary', '').rstrip('.'),
             # TODO: icons are provided as names, need to find a URL for them
             icon=None,
             weather_code=data['icon'],
